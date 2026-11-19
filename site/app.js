@@ -70,6 +70,13 @@ function fmtUtc(iso) {
   const d = new Date(iso);
   return d.toISOString().slice(0, 16).replace("T", " ") + " UTC";
 }
+const CHI = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit",
+  hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZoneName: "short" });
+function fmtChicago(iso) {
+  const p = Object.fromEntries(CHI.formatToParts(new Date(iso)).map(x => [x.type, x.value]));
+  return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute} ${p.timeZoneName}`;
+}
+const fmtBoth = iso => `${fmtUtc(iso)} (${fmtChicago(iso)}, Chicago)`;
 function ago(iso) {
   const h = (Date.now() - new Date(iso).getTime()) / 36e5;
   if (h < 1) return "less than an hour ago";
@@ -357,12 +364,13 @@ async function main() {
   // two separate timestamps
   if (m.last_successful_refresh) {
     $("#st-ok").textContent = fmtUtc(m.last_successful_refresh);
-    $("#st-ok-sub").textContent = `${ago(m.last_successful_refresh)}. Last attempt: ${m.last_attempt ? fmtUtc(m.last_attempt) : "unknown"}.`;
+    $("#st-ok-chi").textContent = `${fmtChicago(m.last_successful_refresh)} in Chicago`;
+    $("#st-ok-sub").textContent = `${ago(m.last_successful_refresh)}. Last attempt: ${m.last_attempt ? fmtBoth(m.last_attempt) : "unknown"}.`;
   } else {
     $("#st-ok").textContent = "Never";
-    $("#st-ok-sub").textContent = `No refresh has fetched every series yet. Last attempt: ${m.last_attempt ? fmtUtc(m.last_attempt) : "unknown"}.`;
+    $("#st-ok-sub").textContent = `No refresh has fetched every series yet. Last attempt: ${m.last_attempt ? fmtBoth(m.last_attempt) : "unknown"}.`;
   }
-  $("#gen").textContent = fmtUtc(m.generated);
+  $("#gen").textContent = fmtBoth(m.generated);
 
   // banner for problems
   const issues = Object.values(S).filter(s => s.status !== "ok" || s.warn);
@@ -425,11 +433,11 @@ async function main() {
 
   // status table
   const t = $("#status-table");
-  t.append(el("thead", {}, el("tr", {}, ...["Series", "Status", "Last good fetch (UTC)", "Latest observation", "Age / limit", "Data"].map(h => el("th", { text: h })))));
+  t.append(el("thead", {}, el("tr", {}, ...["Series", "Status", "Last good fetch", "Latest observation", "Age / limit", "Data"].map(h => el("th", { text: h })))));
   const tb = el("tbody", {});
   Object.values(S).forEach(s => tb.append(el("tr", {},
     el("td", { text: s.title }), el("td", {}, statusBadge(s)),
-    el("td", { text: s.last_fetch_ok ? fmtUtc(s.last_fetch_ok) : "never" }),
+    el("td", { style: "white-space:nowrap" }, ...(s.last_fetch_ok ? [fmtUtc(s.last_fetch_ok), document.createElement("br"), fmtChicago(s.last_fetch_ok)] : ["never"])),
     el("td", { text: s.last_obs_label || "none" }),
     el("td", { text: s.age_days == null ? "" : `${s.age_days} / ${s.limit_days} days` }),
     el("td", {}, s.rows ? el("a", { href: `data/${s.id}.csv`, text: "CSV" }) : "none"))));
