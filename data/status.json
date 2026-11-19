@@ -1,65 +1,75 @@
 {
-  "last_attempt": "2026-11-19T15:53:10Z",
-  "last_successful_refresh": "2026-11-19T15:53:10Z",
+  "last_attempt": "2026-11-19T19:15:04Z",
+  "last_successful_refresh": "2026-11-19T19:15:04Z",
   "series": {
+    "bceao_marginal": {
+      "error": null,
+      "last_fetch_ok": "2026-11-19T19:15:04Z",
+      "status": "ok"
+    },
+    "bceao_min_bid": {
+      "error": null,
+      "last_fetch_ok": "2026-11-19T19:15:04Z",
+      "status": "ok"
+    },
     "ci_cpi_idx": {
       "error": null,
-      "last_fetch_ok": "2026-11-19T15:53:10Z",
+      "last_fetch_ok": "2026-11-19T19:15:04Z",
       "status": "ok"
     },
     "ci_debt": {
       "error": null,
-      "last_fetch_ok": "2026-11-19T15:53:10Z",
+      "last_fetch_ok": "2026-11-19T19:15:04Z",
       "status": "ok"
     },
     "ci_gdp_growth": {
       "error": null,
-      "last_fetch_ok": "2026-11-19T15:53:10Z",
+      "last_fetch_ok": "2026-11-19T19:15:04Z",
       "status": "ok"
     },
     "ci_gov_bal": {
       "error": null,
-      "last_fetch_ok": "2026-11-19T15:53:10Z",
+      "last_fetch_ok": "2026-11-19T19:15:04Z",
       "status": "ok"
     },
     "ci_infl": {
       "error": null,
-      "last_fetch_ok": "2026-11-19T15:53:10Z",
+      "last_fetch_ok": "2026-11-19T19:15:04Z",
       "status": "ok"
     },
     "ci_trade_bal": {
       "error": null,
-      "last_fetch_ok": "2026-11-19T15:53:10Z",
+      "last_fetch_ok": "2026-11-19T19:15:04Z",
       "status": "ok"
     },
     "cocoa_usd": {
       "error": null,
-      "last_fetch_ok": "2026-11-19T15:53:10Z",
+      "last_fetch_ok": "2026-11-19T19:15:04Z",
       "status": "ok"
     },
     "cocoa_xof": {
       "error": null,
-      "last_fetch_ok": "2026-11-19T15:53:10Z",
+      "last_fetch_ok": "2026-11-19T19:15:04Z",
       "status": "ok"
     },
     "eurusd": {
       "error": null,
-      "last_fetch_ok": "2026-11-19T15:53:10Z",
+      "last_fetch_ok": "2026-11-19T19:15:04Z",
       "status": "ok"
     },
     "rer": {
       "error": null,
-      "last_fetch_ok": "2026-11-19T15:53:10Z",
+      "last_fetch_ok": "2026-11-19T19:15:04Z",
       "status": "ok"
     },
     "us_cpi_idx": {
       "error": null,
-      "last_fetch_ok": "2026-11-19T15:53:10Z",
+      "last_fetch_ok": "2026-11-19T19:15:04Z",
       "status": "ok"
     },
     "xof_usd": {
       "error": null,
-      "last_fetch_ok": "2026-11-19T15:53:10Z",
+      "last_fetch_ok": "2026-11-19T19:15:04Z",
       "status": "ok"
     }
   }
