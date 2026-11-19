@@ -1,1 +1,14 @@
-date,rate_pct,source_url
+date,min_bid_rate_pct,marginal_rate_pct,precision,kind,source_url
+2013-09-01,2.5,3.5,month,change,https://economie-ivoirienne.ci/index.php/cadre-macroeconomique/politique-monetaire.html
+2016-12-01,2.5,4.5,month,change,https://economie-ivoirienne.ci/index.php/cadre-macroeconomique/politique-monetaire.html
+2020-06-01,2.0,4.0,month,change,https://economie-ivoirienne.ci/index.php/cadre-macroeconomique/politique-monetaire.html
+2022-06-01,2.25,4.25,month,change,https://economie-ivoirienne.ci/index.php/cadre-macroeconomique/politique-monetaire.html
+2022-09-01,2.5,4.5,month,change,https://economie-ivoirienne.ci/index.php/cadre-macroeconomique/politique-monetaire.html
+2022-12-01,2.75,4.75,month,change,https://economie-ivoirienne.ci/index.php/cadre-macroeconomique/politique-monetaire.html
+2023-03-01,3.0,5.0,month,change,https://economie-ivoirienne.ci/index.php/cadre-macroeconomique/politique-monetaire.html
+2023-09-01,3.25,5.25,month,change,https://economie-ivoirienne.ci/index.php/cadre-macroeconomique/politique-monetaire.html
+2023-12-01,3.5,5.5,month,change,https://economie-ivoirienne.ci/index.php/cadre-macroeconomique/politique-monetaire.html
+2025-06-01,3.25,5.25,month,change,https://economie-ivoirienne.ci/index.php/cadre-macroeconomique/politique-monetaire.html
+2026-03-16,3.0,5.0,day,change,https://www.bceao.int/sites/default/files/2026-09/Communiqu%C3%A9%20de%20Presse%20CPM%209%20septembre%202026.pdf
+2026-06-10,3.0,5.0,day,confirmed,https://fr.allafrica.com/stories/202606110439.html
+2026-09-09,3.0,5.0,day,confirmed,https://www.bceao.int/sites/default/files/2026-09/Communiqu%C3%A9%20de%20Presse%20CPM%209%20septembre%202026.pdf

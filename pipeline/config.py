@@ -2,6 +2,7 @@
 caption block needs (units, frequency, source link, transformation)."""
 from __future__ import annotations
 
+from . import manual as MAN
 from . import sources as S
 from . import transforms as T
 from .common import PEG
@@ -56,6 +57,16 @@ RAW = [
          source=IMF, series_id="GGXWDG_NGDP", url=imf_link("GGXWDG_NGDP"),
          fetch=S.fetch_imf("GGXWDG_NGDP"), min_rows=12, lo=5, hi=200, lag_limit_days=730,
          transform="None, as published. Years from the current year on are IMF projections (flagged)."),
+    dict(id="bceao_min_bid", title="BCEAO minimum bid rate (principal policy rate)", freq="event", unit="% per year",
+         source="BCEAO Monetary Policy Committee decisions, entered by hand (ministry table + BCEAO communiqués)",
+         series_id="data/manual/bceao_policy_rate.csv", url="https://economie-ivoirienne.ci/index.php/cadre-macroeconomique/politique-monetaire.html",
+         fetch=MAN.load_policy_rate("min_bid_rate_pct"), min_rows=8, lo=0, hi=15, lag_limit_days=120,
+         transform="None. Each row of the file carries its own source link. Rates before Sept 2013 are not included. Drawn as steps: a rate holds until the next decision. Month-level dates are the 1st of the month."),
+    dict(id="bceao_marginal", title="BCEAO marginal lending rate", freq="event", unit="% per year",
+         source="BCEAO Monetary Policy Committee decisions, entered by hand (ministry table + BCEAO communiqués)",
+         series_id="data/manual/bceao_policy_rate.csv", url="https://economie-ivoirienne.ci/index.php/cadre-macroeconomique/politique-monetaire.html",
+         fetch=MAN.load_policy_rate("marginal_rate_pct"), min_rows=8, lo=0, hi=15, lag_limit_days=120,
+         transform="Same file and rules as the minimum bid rate."),
 ]
 
 # Derived series: computed from raw inputs, never fetched.
@@ -83,10 +94,6 @@ BY_ID = {s["id"]: s for s in ALL}
 
 # Series we cannot provide. Shown on the dashboard as explicit gaps.
 UNAVAILABLE = [
-    dict(id="bceao_rate", title="BCEAO policy rate",
-         why="No machine-readable BCEAO API was found and the host is blocked from the build sandbox. Rate changes appear only in press releases.",
-         fallback="Manual, source-linked entries in data/manual/bceao_policy_rate.csv (not yet populated).",
-         link="https://www.bceao.int"),
     dict(id="civ_10y", title="Côte d'Ivoire 10-year yield and spread over the Bund",
          why="No free, licence-clean daily 10-year series. Auction yields on UMOA-Titres are the nearest primary data but have no stable API.",
          fallback="Export UMOA-Titres auction results by hand, or license a data feed; the Bund leg is available from FRED (IRLTLT01DEM156N).",

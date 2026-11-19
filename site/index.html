@@ -31,23 +31,14 @@
   <div class="controls" role="group" aria-label="Chart controls">
     <div class="grp seg" id="range"><span class="lbl">Show from</span></div>
     <div class="grp"><button class="btn" id="theme" type="button">Theme: auto</button></div>
+    <div class="grp"><button class="btn" id="refresh" type="button">Refresh data</button><span class="msg" id="refresh-msg" role="status" aria-live="polite"></span>
+      <a href="https://github.com/peha21ac/Country-Dashboard/actions/workflows/refresh.yml" title="Opens GitHub. Choose Run workflow; needs write access to the repository.">Fetch new data from the sources</a></div>
     <div class="key" aria-label="Shaded periods">
       <span><i></i>2014–16 commodity slump</span><span><i></i>2020–21 COVID-19</span><span><i></i>2022 inflation surge</span>
     </div>
   </div>
 
   <main id="charts"></main>
-
-  <section class="sec" id="reading">
-    <h2>How these indicators bear on the question</h2>
-    <p>This is standard reasoning about the channels, not a forecast. The dashboard supplies the inputs; it does not estimate what a devaluation or float would do.</p>
-    <ul>
-      <li><b>Debt.</b> A weaker XOF raises the XOF cost of debt owed in foreign currency. How much depends on the foreign-currency share of public debt, which is not available as a data series here (see data gaps). Debt issued in XOF on the regional market is not affected in nominal terms.</li>
-      <li><b>Trade.</b> Cocoa is sold in dollars while most costs are paid in XOF. A weaker XOF lifts the XOF value of each tonne, shown in the lower cocoa panel, and makes imports dearer. The real exchange rate chart shows whether the franc has drifted away from its 2010 level against the dollar.</li>
-      <li><b>Inflation.</b> Imported goods pass a weaker currency into consumer prices. The 2022 surge shows how exposed prices are to external shocks even under a peg.</li>
-      <li><b>Who decides.</b> The BCEAO sets monetary policy for all eight WAEMU members. The exchange-rate regime is a union decision, not one Côte d'Ivoire can change alone.</li>
-    </ul>
-  </section>
 
   <section class="sec" id="gaps">
     <h2>Data gaps</h2>

@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from pipeline import build, common, config, sources, transforms
+from pipeline import build, common, config, manual, sources, transforms
 from pipeline.common import PEG, ValidationError, make_df, staleness, validate
 
 NOW = dt.datetime(2026, 11, 18, 12, 0, tzinfo=dt.timezone.utc)
@@ -180,11 +180,18 @@ def synthetic_fetchers():
                            ["proj" if y >= 2026 else "" for y in yrs])
         return f
 
+    def rate(v):
+        def f(now=None):
+            d = pd.date_range("2013-09-01", periods=10, freq="90D")
+            return make_df(d, [v] * 10)
+        return f
+
     return {
         "eurusd": eurusd, "cocoa_usd": cocoa,
         "ci_cpi_idx": annual(70, 3), "us_cpi_idx": annual(80, 2),
         "ci_infl": annual(2, 0.05), "ci_trade_bal": annual(1, 0.1),
         "ci_gdp_growth": imf(5), "ci_gov_bal": imf(-3), "ci_debt": imf(40),
+        "bceao_min_bid": rate(3.0), "bceao_marginal": rate(5.0),
     }
 
 
@@ -268,3 +275,43 @@ def test_first_run_failure_is_unavailable_not_fabricated(sandbox, monkeypatch):
     assert status["series"]["ci_debt"]["status"] == "unavailable"
     assert site["series"]["ci_debt"]["values"] == []
     assert status["last_successful_refresh"] is None
+
+
+# ------------------------------------------------------ manual policy rate
+GOOD = ("date,min_bid_rate_pct,marginal_rate_pct,precision,kind,source_url\n"
+        + "".join(f"2020-0{i}-01,2.5,4.5,month,change,https://example.org/{i}\n" for i in range(1, 9)))
+
+
+def test_manual_loader_ok(tmp_path, monkeypatch):
+    f = tmp_path / "r.csv"; f.write_text(GOOD)
+    monkeypatch.setattr(manual, "MANUAL", f)
+    df = manual.load_policy_rate("marginal_rate_pct")()
+    assert len(df) == 8 and df["value"].iloc[0] == 4.5
+
+
+@pytest.mark.parametrize("old,new,msg", [
+    ("https://example.org/3", "", "source_url"),
+    ("change", "guess", "kind"),
+    ("month", "week", "precision"),
+])
+def test_manual_loader_rejects(tmp_path, monkeypatch, old, new, msg):
+    f = tmp_path / "r.csv"; f.write_text(GOOD.replace(old, new, 1))
+    monkeypatch.setattr(manual, "MANUAL", f)
+    with pytest.raises(ValidationError, match=msg):
+        manual.load_policy_rate("min_bid_rate_pct")()
+
+
+def test_event_series_staleness():
+    assert staleness("event", pd.Timestamp("2026-09-09"), NOW)["warn"] is False   # 70 days
+    assert staleness("event", pd.Timestamp("2026-06-10"), NOW)["warn"] is True    # 161 days
+
+
+def test_real_policy_file_is_consistent():
+    df = pd.read_csv(common.ROOT / "data" / "manual" / "bceao_policy_rate.csv", parse_dates=["date"])
+    assert df["date"].is_monotonic_increasing and not df["date"].duplicated().any()
+    assert (df["marginal_rate_pct"] >= df["min_bid_rate_pct"]).all()
+    assert df["source_url"].str.startswith("http").all()
+    # 'confirmed' rows must repeat the rate in force, never change it
+    for i in df.index[df["kind"] == "confirmed"]:
+        assert df.loc[i, ["min_bid_rate_pct", "marginal_rate_pct"]].tolist() == \
+               df.loc[i - 1, ["min_bid_rate_pct", "marginal_rate_pct"]].tolist()

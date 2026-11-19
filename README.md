@@ -14,10 +14,11 @@ An auto-refreshing dashboard of public indicators for judging the peg of the Wes
 | Cocoa | USD per tonne; XOF per tonne (derived) | FRED `PCOCOUSDM` | Monthly |
 | External balance | Goods and services, % of GDP | World Bank `NE.RSB.GNFS.ZS` | Annual |
 | Inflation | Headline CPI, % y/y | World Bank `FP.CPI.TOTL.ZG` | Annual |
+| BCEAO policy rates | Minimum bid rate, marginal lending rate (step lines) | BCEAO decisions entered by hand in `data/manual/bceao_policy_rate.csv`, each row with a source link | On decisions |
 | Public finances | Net lending/borrowing, gross debt, % of GDP | IMF DataMapper `GGXCNL_NGDP`, `GGXWDG_NGDP` | Annual |
 | Real GDP growth | % y/y | IMF DataMapper `NGDP_RPCH` | Annual |
 
-Not available (shown on the dashboard as gaps, never estimated): BCEAO policy rate, Côte d'Ivoire 10-year yield and Bund spread, core CPI, foreign-currency share of public debt.
+Not available (shown on the dashboard as gaps, never estimated): Côte d'Ivoire 10-year yield and Bund spread, core CPI, foreign-currency share of public debt.
 
 ## How the refresh works
 
@@ -32,6 +33,14 @@ Not available (shown on the dashboard as gaps, never estimated): BCEAO policy ra
 **Two timestamps, kept apart.** *Last successful refresh* only moves when every series updated. *Latest observation* is read from each series' own data.
 
 **Failure handling.** A failed fetch or failed sanity check keeps the last good CSV and marks the series stale with its last good date. Derived series inherit staleness from their inputs. Warnings show when data is older than its expected release lag.
+
+## Refresh button
+
+A static page cannot run the pipeline, so the **Refresh data** button reloads the latest *published* data. The **Fetch new data from the sources** link opens the GitHub workflow page, where **Run workflow** starts a real fetch (needs write access to the repository).
+
+## Updating the policy rates
+
+After each BCEAO Monetary Policy Committee meeting, add a row to `data/manual/bceao_policy_rate.csv` (`kind` is `change` when a rate moved, `confirmed` when it was held) with a link to the communiqué. The next run validates it. Do not copy data from sites whose terms forbid redistribution.
 
 ## One-time setup
 

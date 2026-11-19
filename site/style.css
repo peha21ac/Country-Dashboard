@@ -45,7 +45,7 @@ a { color: var(--link); }
 a:focus-visible, button:focus-visible, summary:focus-visible, svg:focus-visible, select:focus-visible, input:focus-visible {
   outline: 2px solid var(--s1); outline-offset: 2px;
 }
-.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
 
 /* masthead */
 .mast { padding: 28px 0 20px; border-bottom: 1px solid var(--rule); }
@@ -146,3 +146,22 @@ details.tbl summary { cursor: pointer; color: var(--link); width: fit-content; p
 .scrollx { overflow-x: auto; }
 footer { padding: 24px 0 48px; color: var(--ink-3); font-size: 0.84rem; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* charts that belong together sit side by side */
+.row { display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); column-gap: 32px; }
+.cell { min-width: 0; margin-bottom: 8px; }
+.cell .head h3 { font-size: 1rem; margin: 0 0 2px; letter-spacing: -0.005em; }
+.cell .note { margin: 0 0 8px; color: var(--ink-2); font-size: 0.84rem; }
+.cell .below { margin-top: 10px; }
+.cell .cap { grid-template-columns: 1fr; gap: 12px; }
+.cell .cap dl { grid-template-columns: 7.2em 1fr; }
+@media (min-width: 900px) {
+  .cell { display: grid; grid-row: span 4; grid-template-rows: subgrid; align-content: start; }
+}
+@media (max-width: 899px) { .row { grid-template-columns: 1fr; } .cell { margin-bottom: 28px; } }
+.msg { color: var(--ink-2); font-size: 0.84rem; max-width: 34ch; }
+.btn:disabled { opacity: 0.55; cursor: progress; }
+.chart > h2 { margin-bottom: 14px; }
+
+.cell .leg { min-height: 0; }
+.cell .leg .legend { margin: 0 0 4px; }

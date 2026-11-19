@@ -19,7 +19,7 @@
 
   <section class="sec">
     <h2>Verification status</h2>
-    <p>The fetchers were written against the documented formats of the ECB, FRED, World Bank and IMF DataMapper APIs and unit-tested on synthetic data. The environment they were built in could not reach those hosts, so no parser had been run against live responses when this page was written. The first real run happens on GitHub Actions. If a source's format differs from what the code expects, that series shows as “No data” or “Stale” on the dashboard, with the error message in the status table. Nothing is filled in to cover a failure.</p>
+    <p>The first live run, on 18 November 2026, fetched all twelve automated series from the ECB, FRED, World Bank and IMF DataMapper, and every one passed its checks. The two policy-rate series are entered by hand and checked on every run for a source link on each row. Unit tests use synthetic data. If a source changes its format later, that series shows as “No data” or “Stale” with the error in the status table. Nothing is filled in to cover a failure.</p>
   </section>
 
   <section class="sec">
@@ -29,6 +29,7 @@
       <li><b>XOF per USD.</b> Derived: 655.957 ÷ EUR/USD, where EUR/USD is USD per 1 EUR from the ECB reference rate. Up means the CFA franc is weaker against the dollar.</li>
       <li><b>Real exchange rate (RER).</b> RER = S × P*/P, rebased so 2010 = 100. S is the annual mean of XOF per USD, P* the US CPI and P the Ivorian CPI, both World Bank annual indices. <b>Up means real depreciation</b> (Ivorian goods cheaper in dollar terms, a more competitive position). <b>Down means real appreciation</b>, the usual sign of overvaluation. The base year is a choice, not an equilibrium estimate: a reading below 100 means the franc is stronger in real terms than in 2010, not that it is overvalued.</li>
       <li><b>Cocoa in XOF.</b> Cocoa USD per tonne × the month's mean XOF per USD ÷ 1,000,000, for months with at least 15 daily rates.</li>
+      <li><b>BCEAO policy rates.</b> The minimum bid rate (<i>taux minimum de soumission</i>) is the principal policy rate; the marginal lending rate is the ceiling of the interest-rate corridor. Both are shown as step lines: a rate holds until the next decision. Trading Economics reports the marginal lending rate as “the” interest rate for Côte d'Ivoire, which is why its figure (5%) differs from the principal rate (3%).</li>
       <li><b>Projection.</b> IMF DataMapper mixes actuals, estimates and projections. Years from the current calendar year on are flagged as projections and drawn pale or dashed. The latest one or two actual years may still be IMF staff estimates.</li>
       <li><b>Shaded periods.</b> 2014–16, 2020–21 and 2022 are marked for orientation. They are not statistical definitions.</li>
     </ul>
@@ -48,7 +49,7 @@
       <li><b>Checks:</b> not empty; minimum row count; dates ascending and unique; values inside a plausible range for the series; no observation dated in the future; the parity constant equals 655.957.</li>
       <li><b>If a source fails or its data fails a check,</b> the last good CSV is kept, the series is marked stale with its last good observation, and the “last successful refresh” time does not move. That time only advances when every series updates.</li>
       <li><b>Derived series</b> (XOF per USD, real exchange rate, cocoa in XOF) are marked stale if any input is stale.</li>
-      <li><b>Warnings</b> appear when the newest observation is older than its expected release lag: 5 days for daily series, 60 days after month end for monthly, 18 months after year end for annual series, and 24 months for World Bank and IMF annual series, which publish later.</li>
+      <li><b>Warnings</b> appear when the newest observation is older than its expected release lag: 5 days for daily series, 60 days after month end for monthly, 18 months after year end for annual series, and 24 months for World Bank and IMF annual series, which publish later, and 120 days for the policy rates (the committee meets about every quarter).</li>
       <li>A degraded run still deploys the site, then fails the job so the repository owner is notified.</li>
       <li>“Latest observation” always comes from the data. “Last successful refresh” always comes from the pipeline run. They are shown separately because a successful refresh can carry data that is months old.</li>
     </ul>
@@ -60,7 +61,8 @@
       <li><b>Mixed frequencies.</b> Exchange rates are daily, cocoa is monthly, everything else is annual. Nothing is interpolated or converted to a common frequency except where a formula says so (annual mean for the real exchange rate, monthly mean for cocoa in XOF).</li>
       <li><b>The real exchange rate is annual and bilateral.</b> It uses World Bank annual CPI, so it ends a year or more behind the daily exchange rate. It compares only with the US, while the euro area is the main trading partner. A trade-weighted real effective rate would be a better gauge. A monthly CPI source from the IMF was not used because its API could not be tested.</li>
       <li><b>The peg line is a legal constant.</b> It cannot show market pressure on the peg. Pressure would show up in reserves, the sovereign spread or a parallel-market rate, none of which are on the dashboard.</li>
-      <li><b>Missing series.</b> BCEAO policy rate, Côte d'Ivoire 10-year yield and spread over the Bund, core CPI, and the foreign-currency share of public debt are not shown. See the data gaps section of the dashboard for why and for fallbacks. A manual file for policy-rate entries exists but is empty.</li>
+      <li><b>Missing series.</b> The Côte d'Ivoire 10-year yield and spread over the Bund, core CPI, and the foreign-currency share of public debt are not shown. See the data gaps section of the dashboard for why and for fallbacks.</li>
+      <li><b>Policy rates are entered by hand and may be incomplete.</b> Rates from September 2013 on come from a table published by the Ivorian Ministry of Economy (attributed to BCEAO), which gives month-level dates only and, by its own description, lists selected changes, so a change could be missing. Changes from March 2026 are linked to BCEAO's own communiqué of 9 September 2026. Nothing before September 2013 is shown. Someone must add each new decision to <code>data/manual/bceao_policy_rate.csv</code>; a warning appears 120 days after the last entry. Trading Economics was not used: its terms grant only a personal, non-transferable licence to analyse data, and a public dashboard needs a licensed API.</li>
       <li><b>Trade balance is goods and services together,</b> not goods only.</li>
       <li><b>Revisions.</b> The IMF revises its figures twice a year and the World Bank revises CPI and national accounts. Each refresh overwrites a series with the latest vintage. Earlier vintages remain only in the repository's commit history.</li>
       <li><b>Cocoa is the world price</b> (IMF primary commodity series via FRED), not the Ivorian farm-gate price or the price the regulator achieves on forward sales.</li>

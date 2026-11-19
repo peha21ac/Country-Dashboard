@@ -23,7 +23,7 @@ UA = "civ-peg-dashboard/1.0 (+https://github.com/peha21ac/Country-Dashboard)"
 
 # Warn when the newest observation is older than this many days after the
 # end of its period (expected release lag).
-LAG_LIMIT_DAYS = {"daily": 5, "monthly": 60, "annual": 548}
+LAG_LIMIT_DAYS = {"daily": 5, "monthly": 60, "annual": 548, "event": 120}
 
 
 class FetchError(Exception):
@@ -115,7 +115,7 @@ def validate(df: pd.DataFrame, spec: dict, now: dt.datetime | None = None) -> No
 
 def period_end(date, freq: str) -> pd.Timestamp:
     d = pd.Timestamp(date)
-    if freq == "daily":
+    if freq in ("daily", "event"):
         return d
     if freq == "monthly":
         return d + pd.offsets.MonthEnd(0)

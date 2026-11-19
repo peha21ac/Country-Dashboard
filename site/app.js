@@ -10,44 +10,46 @@ const BANDS = [
 const EUROLEX = "https://eur-lex.europa.eu/eli/dec/1998/683/oj/eng";
 
 // ---- chart definitions (what to draw; data comes from data.json) ----------
-const CHARTS = [
-  { id: "fx", title: "Nominal exchange rate: fixed to the euro, moving with the dollar",
-    read: "XOF per EUR is fixed by law. XOF per USD moves only because EUR/USD moves. On the blue line, up means the CFA franc is weaker against the dollar.",
-    panels: [
-      { title: "XOF per 1 unit of foreign currency", kind: "line", dec: 1, series: [
-        { id: "xof_usd", name: "XOF per USD", short: "USD", c: "--s1" },
-        { id: "peg", name: "XOF per EUR (fixed parity)", short: "EUR (fixed)", c: "--s2", dec: 2 }] },
-      { title: "USD per 1 EUR (up = euro stronger)", kind: "line", dec: 3, series: [
-        { id: "eurusd", name: "EUR/USD", short: "EUR/USD", c: "--s3" }] }],
+const CHARTS = {
+  nominal: { title: "XOF per USD and per EUR", note: "Up = CFA franc weaker against the dollar. The euro rate is fixed by law.",
+    panels: [{ title: "XOF per 1 unit of foreign currency", kind: "line", dec: 1, series: [
+      { id: "xof_usd", name: "XOF per USD", c: "--s1" },
+      { id: "peg", name: "XOF per EUR (fixed parity)", c: "--s2", dec: 2, tag: "655.96 fixed" }] }],
     extraCaps: [{ title: "XOF per EUR (fixed parity)", units: "XOF per 1 EUR (up = XOF weaker)", freq: "Constant (legal parity)",
       source: "EU Council Decision 98/683/EC on exchange-rate matters in the CFA franc zone", url: EUROLEX,
       latest: "Not an observation: the parity is a constant, not a market quote",
       transform: "None. Drawn as the constant 655.957 (shown as 655.96) across the same dates as EUR/USD." }] },
-  { id: "rer", title: "Real exchange rate against the US dollar",
-    read: "Up means real depreciation of the XOF (Ivorian goods get cheaper in dollar terms). Down means real appreciation, the usual sign of overvaluation. The index shows change since 2010; it is not an estimate of the right level.",
-    panels: [{ title: "Index, 2010 = 100", kind: "line", dec: 1, ref: { v: 100, label: "Base year 2010 = 100" }, series: [
-      { id: "rer", name: "Real exchange rate vs USD", short: "RER", c: "--s1" }] }],
+  eurusd: { title: "EUR/USD", note: "The dollar rate of the euro. It moves the blue line in the left chart.",
+    panels: [{ title: "USD per 1 EUR (up = euro stronger)", kind: "line", dec: 3, series: [{ id: "eurusd", name: "EUR/USD", c: "--s3" }] }] },
+  rer: { title: "Real exchange rate vs USD", note: "Up = real depreciation; down = real appreciation, the usual sign of overvaluation. Change since 2010, not the right level.",
+    panels: [{ title: "Index, 2010 = 100", kind: "line", dec: 1, ref: { v: 100, label: "2010 = 100" }, series: [{ id: "rer", name: "Real exchange rate vs USD", c: "--s1" }] }],
     ends: ["Real appreciation", "Real depreciation"] },
-  { id: "cocoa", title: "Cocoa: priced in dollars, paid out in CFA francs",
-    read: "The upper panel is the world price in USD. The lower panel is the same price converted at the month's average XOF/USD rate, which is what the exporter and the treasury receive in local currency.",
-    panels: [
-      { title: "USD per metric tonne", kind: "line", dec: 0, series: [{ id: "cocoa_usd", name: "Cocoa, USD per tonne", short: "USD", c: "--s1" }] },
-      { title: "XOF million per metric tonne", kind: "line", dec: 2, series: [{ id: "cocoa_xof", name: "Cocoa, XOF million per tonne", short: "XOF", c: "--s2" }] }] },
-  { id: "trade", title: "External balance on goods and services",
-    read: "Positive is a surplus. This is goods and services together, the nearest series available; a goods-only balance was not found in the sources used.",
-    panels: [{ title: "% of GDP", kind: "bar", dec: 1, zero: true, series: [{ id: "ci_trade_bal", name: "External balance, % of GDP", short: "Balance", c: "--s1" }] }] },
-  { id: "infl", title: "Consumer price inflation",
-    read: "Annual average, headline only. Core inflation is not published for Côte d'Ivoire in the sources used, and no proxy is shown.",
-    panels: [{ title: "% year on year", kind: "line", dec: 1, zero: true, series: [{ id: "ci_infl", name: "Headline CPI inflation", short: "Headline", c: "--s1" }] }] },
-  { id: "fiscal", title: "Public finances",
-    read: "Deficits are negative. Pale or dashed marks are IMF projections, not outturns.",
-    panels: [
-      { title: "General government net lending/borrowing, % of GDP", kind: "bar", dec: 1, zero: true, series: [{ id: "ci_gov_bal", name: "Net lending/borrowing", short: "Balance", c: "--s1" }] },
-      { title: "General government gross debt, % of GDP", kind: "line", dec: 1, series: [{ id: "ci_debt", name: "Gross debt", short: "Debt", c: "--s2" }] }] },
-  { id: "growth", title: "Real GDP growth",
-    read: "Year-on-year change in real GDP. Pale marks are IMF projections.",
-    panels: [{ title: "% year on year", kind: "bar", dec: 1, zero: true, series: [{ id: "ci_gdp_growth", name: "Real GDP growth", short: "Growth", c: "--s1" }] }] },
+  cocoa_usd: { title: "Cocoa in dollars", note: "World price, the currency cocoa is sold in.",
+    panels: [{ title: "USD per metric tonne", kind: "line", dec: 0, series: [{ id: "cocoa_usd", name: "Cocoa, USD per tonne", c: "--s1" }] }] },
+  cocoa_xof: { title: "Cocoa in CFA francs", note: "Same price at the month's average XOF/USD rate: what is received in local currency.",
+    panels: [{ title: "XOF million per metric tonne", kind: "line", dec: 2, series: [{ id: "cocoa_xof", name: "Cocoa, XOF million per tonne", c: "--s2" }] }] },
+  growth: { title: "Real GDP growth", note: "Pale bars are IMF projections.",
+    panels: [{ title: "% year on year", kind: "bar", dec: 1, zero: true, series: [{ id: "ci_gdp_growth", name: "Real GDP growth", c: "--s1" }] }] },
+  infl: { title: "Consumer price inflation", note: "Annual average, headline. Core inflation is not published here; no proxy is shown.",
+    panels: [{ title: "% year on year", kind: "line", dec: 1, zero: true, series: [{ id: "ci_infl", name: "Headline CPI inflation", c: "--s1" }] }] },
+  trade: { title: "External balance", note: "Goods and services together; positive = surplus.",
+    panels: [{ title: "% of GDP", kind: "bar", dec: 1, zero: true, series: [{ id: "ci_trade_bal", name: "External balance, % of GDP", c: "--s1" }] }] },
+  policy: { title: "BCEAO policy rates", note: "Each rate holds until the next decision. History starts Sept 2013; entered by hand from BCEAO decisions.",
+    panels: [{ title: "% per year", kind: "step", dec: 2, series: [
+      { id: "bceao_min_bid", name: "Minimum bid rate", c: "--s1" },
+      { id: "bceao_marginal", name: "Marginal lending rate", c: "--s2" }] }] },
+  gov_bal: { title: "Government balance", note: "Deficits are negative. Pale bars are IMF projections.",
+    panels: [{ title: "Net lending/borrowing, % of GDP", kind: "bar", dec: 1, zero: true, series: [{ id: "ci_gov_bal", name: "Net lending/borrowing", c: "--s1" }] }] },
+  debt: { title: "Public debt", note: "Gross debt of general government. Dashed = IMF projections.",
+    panels: [{ title: "% of GDP", kind: "line", dec: 1, series: [{ id: "ci_debt", name: "Gross debt", c: "--s2" }] }] },
+};
+const GROUPS = [
+  { id: "fx", title: "Exchange rates", charts: ["nominal", "eurusd", "rer"] },
+  { id: "cocoa", title: "Cocoa", charts: ["cocoa_usd", "cocoa_xof"] },
+  { id: "macro", title: "Growth, prices and trade", charts: ["growth", "infl", "trade"] },
+  { id: "policy", title: "Policy rates and public finances", charts: ["policy", "gov_bal", "debt"] },
 ];
+const FREQ_LABEL = { daily: "Daily", monthly: "Monthly", annual: "Annual", event: "Irregular: when the committee decides (entered by hand)" };
 
 // ---- helpers ---------------------------------------------------------------
 const $ = (s, r = document) => r.querySelector(s);
@@ -107,6 +109,11 @@ function seriesPoints(doc, id) {
     label: annual ? d.slice(0, 4) : monthly ? d.slice(0, 7) : d, raw: d,
   }));
 }
+function floorIdx(pts, t) {            // value in force at time t (step series)
+  let lo = 0, hi = pts.length - 1, ans = -1;
+  while (lo <= hi) { const m = (lo + hi) >> 1; if (pts[m].t <= t) { ans = m; lo = m + 1; } else hi = m - 1; }
+  return ans;
+}
 function nearest(pts, t) {
   let lo = 0, hi = pts.length - 1;
   while (lo < hi) { const m = (lo + hi) >> 1; if (pts[m].t < t) lo = m + 1; else hi = m; }
@@ -128,7 +135,7 @@ function captionFor(s) {
   const src = el("dd", {}, el("a", { href: s.url, text: s.source }), ` (${s.series_id})`);
   const dl = el("dl", {},
     el("dt", { text: "Units" }), el("dd", { text: s.unit }),
-    el("dt", { text: "Frequency" }), el("dd", { text: s.freq[0].toUpperCase() + s.freq.slice(1) }),
+    el("dt", { text: "Frequency" }), el("dd", { text: FREQ_LABEL[s.freq] || s.freq }),
     el("dt", { text: "Source" }), src,
     el("dt", { text: "Latest observation" }), latest,
     el("dt", { text: "Transformation" }), el("dd", { text: s.transform }));
@@ -147,8 +154,8 @@ function captionExtra(c) {
 // ---- chart rendering -------------------------------------------------------
 const tooltipEls = new WeakMap();
 
-function renderChart(def, doc, host, from) {
-  host.textContent = "";
+function renderChart(def, doc, host, from, legHost) {
+  host.textContent = ""; if (legHost) legHost.textContent = "";
   const ids = def.panels.flatMap(p => p.series.map(s => s.id));
   const missing = ids.filter(id => id !== "peg" && !doc.series[id].values.length);
   const x0 = Date.UTC(from, 0, 1);
@@ -172,8 +179,8 @@ function renderChart(def, doc, host, from) {
       const k = pp.p.kind === "bar" ? el("i", { class: "bx", style: `background:${css(x.s.c)}` }) : el("i", { class: "ln", style: `border-color:${css(x.s.c)}` });
       lg.append(el("span", {}, k, x.s.name));
     }
-    if (hasProj) lg.append(el("span", {}, el("i", { class: "ln dash", style: "border-color:var(--ink-3)" }), "IMF projection (pale or dashed)"));
-    host.append(lg);
+    if (hasProj) lg.append(el("span", {}, el("i", { class: "ln dash", style: "border-color:var(--ink-3)" }), "IMF projection"));
+    (legHost || host).append(lg);
   }
 
   let xmax = x0;
@@ -193,7 +200,7 @@ function renderChart(def, doc, host, from) {
 
   prepared.forEach((pp, pi) => {
     const last = pi === prepared.length - 1;
-    const H = (pp.p.kind === "bar" ? 190 : def.panels.length > 1 && pi > 0 ? 150 : 230) - (wide ? 0 : 40);
+    const H = wide ? 250 : 215;
     const m = { ...M, b: last ? 22 : 4 };
     const plotH = H - m.t - m.b;
     host.append(el("p", { class: "panel-title", text: pp.p.title }));
@@ -201,7 +208,8 @@ function renderChart(def, doc, host, from) {
     let lo = Math.min(...vals), hi = Math.max(...vals);
     if (pp.p.ref) { lo = Math.min(lo, pp.p.ref.v); hi = Math.max(hi, pp.p.ref.v); }
     if (pp.p.zero || pp.p.kind === "bar") { lo = Math.min(lo, 0); hi = Math.max(hi, 0); }
-    if (pp.p.kind === "line") { const pd = (hi - lo) * 0.06 || 1; lo -= pd; hi += pd; }
+    if (pp.p.kind !== "bar") { const pd = (hi - lo) * 0.06 || 1; lo -= pd; hi += pd; }
+    if (pp.p.kind === "step") lo = Math.min(lo, 0);
     const ticks = niceTicks(lo, hi, 4), ylo = ticks[0], yhi = ticks[ticks.length - 1];
     const Y = v => m.t + (1 - (v - ylo) / (yhi - ylo)) * plotH;
 
@@ -235,7 +243,12 @@ function renderChart(def, doc, host, from) {
     const labels = [];
     pp.series.forEach(x => {
       if (!x.pts.length) return;
-      if (pp.p.kind === "line") {
+      if (pp.p.kind === "step") {
+        const d = x.pts.map((q, i) => i === 0 ? `M${X(q.t).toFixed(1)},${Y(q.v).toFixed(1)}` : `H${X(q.t).toFixed(1)}V${Y(q.v).toFixed(1)}`).join("");
+        svg.append(sv("path", { d, fill: "none", style: `stroke:${css(x.s.c)}`, "stroke-width": 2, "stroke-linejoin": "round" }));
+        const e = x.pts[x.pts.length - 1];
+        svg.append(sv("circle", { cx: X(e.t), cy: Y(e.v), r: 4, style: `fill:${css(x.s.c)};stroke:var(--surface)`, "stroke-width": 2 }));
+      } else if (pp.p.kind === "line") {
         const act = x.pts.filter(q => q.f !== "proj"), proj = x.pts.filter(q => q.f === "proj");
         const path = a => a.map((q, i) => `${i ? "L" : "M"}${X(q.t).toFixed(1)},${Y(q.v).toFixed(1)}`).join("");
         if (act.length) svg.append(sv("path", { d: path(act), fill: "none", style: `stroke:${css(x.s.c)}`, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
@@ -245,7 +258,8 @@ function renderChart(def, doc, host, from) {
         }
         const e = act.length ? act[act.length - 1] : proj[proj.length - 1];
         svg.append(sv("circle", { cx: X(e.t), cy: Y(e.v), r: 4, style: `fill:${css(x.s.c)};stroke:var(--surface)`, "stroke-width": 2 }));
-        if (wide) labels.push({ y: Y(e.v), x: X(e.t), text: `${x.s.short} ${fmtNum(e.v, x.s.dec ?? pp.p.dec)}`, above: proj.length > 0 });
+        if (wide) labels.push({ y: Y(e.v), x: X(e.t), text: `${x.s.short || x.s.name} ${fmtNum(e.v, x.s.dec ?? pp.p.dec)}`, above: proj.length > 0 });
+        if (x.s.tag) svg.append(sv("text", { x: M.l + 6, y: Y(x.pts[0].v) - 6, class: "lab" }, x.s.tag));
       } else {
         const n = Math.max(1, (xb - xa) / YEAR_MS), bw = Math.max(3, Math.min(22, (plotW / n) * 0.62));
         x.pts.forEach(q => {
@@ -273,12 +287,12 @@ function renderChart(def, doc, host, from) {
     // crosshair + hit layer
     const cross = sv("line", { y1: m.t, y2: m.t + plotH, style: "stroke:var(--ink-2)", "stroke-width": 1, visibility: "hidden" });
     const dots = pp.series.map(x => { const c = sv("circle", { r: 4.5, style: `fill:${css(x.s.c)};stroke:var(--surface)`, "stroke-width": 2, visibility: "hidden" }); return c; });
-    if (pp.p.kind === "line") { svg.append(cross); dots.forEach(d => svg.append(d)); }
+    if (pp.p.kind !== "bar") { svg.append(cross); dots.forEach(d => svg.append(d)); }
     const hit = sv("rect", { x: m.l, y: m.t, width: plotW, height: plotH, fill: "transparent" });
     svg.append(hit);
     const panel = { svg, cross, dots, pp, X, Y, m, plotH, kind: pp.p.kind, idx: null };
     ctx.panels.push(panel);
-    if (pp.p.kind === "line") lineCtx.push(panel);
+    if (pp.p.kind !== "bar") lineCtx.push(panel);
     host.append(el("div", { class: "plot" }, svg));
     hit.addEventListener("pointermove", e => { const r = svg.getBoundingClientRect(); show(panel, invX(((e.clientX - r.left) / r.width) * W)); });
     hit.addEventListener("pointerleave", hide);
@@ -299,28 +313,31 @@ function renderChart(def, doc, host, from) {
   }
   function show(panel, t) {
     const rows = []; let label = "";
-    const isLine = panel.kind === "line";
+    const isLine = panel.kind !== "bar";
     const targets = isLine ? lineCtx : [panel];
     let tx = null;
     targets.forEach(p => p.pp.series.forEach((x, k) => {
       if (!x.pts.length) return;
-      const i = nearest(x.pts, t), q = x.pts[i];
-      if (p === panel && k === 0) { panel.idx = i; }
-      if (tx == null) { tx = q.t; label = q.label + (q.f === "proj" ? " (IMF projection)" : ""); }
-      rows.push({ name: x.s.name, c: x.s.c, v: fmtNum(q.v, x.s.dec ?? p.pp.p.dec), proj: q.f === "proj" });
-      if (isLine) { p.dots[k].setAttribute("cx", p.X(q.t)); p.dots[k].setAttribute("cy", p.Y(q.v)); p.dots[k].setAttribute("visibility", "visible"); }
+      const step = p.kind === "step";
+      const i = step ? floorIdx(x.pts, t) : nearest(x.pts, t);
+      if (i < 0) { if (isLine) p.dots[k].setAttribute("visibility", "hidden"); return; }
+      const q = x.pts[i];
+      const px = step ? Math.min(Math.max(t, x.pts[0].t), x.pts[x.pts.length - 1].t) : q.t;
+      if (p === panel && k === 0) panel.idx = i;
+      if (tx == null) { tx = px; label = step ? `As of the ${q.label} decision` : q.label + (q.f === "proj" ? " (IMF projection)" : ""); }
+      rows.push({ name: x.s.name, c: x.s.c, v: fmtNum(q.v, x.s.dec ?? p.pp.p.dec) + (step ? "%" : ""), proj: q.f === "proj" });
+      if (isLine) { p.dots[k].setAttribute("cx", p.X(px)); p.dots[k].setAttribute("cy", p.Y(q.v)); p.dots[k].setAttribute("visibility", "visible"); }
     }));
+    if (tx == null) return hide();
     if (isLine) lineCtx.forEach(p => { p.cross.setAttribute("x1", p.X(tx)); p.cross.setAttribute("x2", p.X(tx)); p.cross.setAttribute("visibility", "visible"); });
-    else {
-      panel.svg.querySelectorAll(".bar").forEach(b => b.style.opacity = Math.abs(+b.dataset.t - tx) < 1 ? "1" : "0.55");
-    }
+    else panel.svg.querySelectorAll(".bar").forEach(b => b.style.opacity = Math.abs(+b.dataset.t - tx) < 1 ? "1" : "0.55");
     tip.textContent = "";
     tip.append(el("div", { class: "d", text: label }));
     rows.forEach(r => tip.append(el("div", { class: "r" }, el("span", { class: "k" }, el("b", { style: `border-color:${css(r.c)}` }), r.name), el("span", { class: "v", text: r.v }))));
     const px = panel.X(tx);
     const hostW = host.clientWidth, w = 200;
     tip.style.left = Math.max(0, Math.min(hostW - w, px + 14 > hostW - w ? px - w - 14 : px + 14)) + "px";
-    tip.style.top = (host.querySelector(".plot") ? panel.svg.parentElement.offsetTop + 8 : 8) + "px";
+    tip.style.top = (panel.svg.parentElement.offsetTop + 8) + "px";
     tip.classList.add("on");
   }
   host.append(tip);
@@ -349,17 +366,22 @@ function buildTable(def, doc, from) {
 }
 
 // ---- page ------------------------------------------------------------------
-async function main() {
-  let doc;
-  try {
-    const r = await fetch("data.json", { cache: "no-store" });
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    doc = await r.json();
-  } catch (e) {
-    $("#st-ok").textContent = "Data file could not be loaded";
-    $("#banner").append(el("div", { class: "banner bad", role: "alert", text: `data.json failed to load (${e.message}). Reload the page; if it persists the last deploy is broken.` }));
-    return;
-  }
+let doc = null, from = 2005;
+let hosts = [], tableBoxes = [];
+const root = () => $("#charts");
+
+async function loadDoc(bust) {
+  const r = await fetch(bust ? `data.json?t=${Date.now()}` : "data.json", { cache: "no-store" });
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return r.json();
+}
+
+function renderAll() {
+  hosts.forEach(h => renderChart(h.def, doc, h.host, from, h.leg));
+  tableBoxes.forEach(t => { if (t.det.open) { t.box.textContent = ""; t.box.append(buildTable(t.def, doc, from)); } });
+}
+
+function build() {
   const m = doc.meta, S = doc.series;
 
   // two separate timestamps
@@ -369,71 +391,52 @@ async function main() {
     $("#st-ok-sub").textContent = `${ago(m.last_successful_refresh)}. Last attempt: ${m.last_attempt ? fmtBoth(m.last_attempt) : "unknown"}.`;
   } else {
     $("#st-ok").textContent = "Never";
+    $("#st-ok-chi").textContent = "";
     $("#st-ok-sub").textContent = `No refresh has fetched every series yet. Last attempt: ${m.last_attempt ? fmtBoth(m.last_attempt) : "unknown"}.`;
   }
   $("#gen").textContent = fmtBoth(m.generated);
 
   // banner for problems
+  const bn = $("#banner"); bn.textContent = "";
   const issues = Object.values(S).filter(s => s.status !== "ok" || s.warn);
-  const bn = $("#banner");
   if (issues.length) {
     const ul = el("ul", {});
     issues.forEach(s => ul.append(el("li", { text: `${s.title}: ${s.status === "unavailable" ? "no data" : s.status === "stale" ? `stale, last good observation ${s.last_obs_label}` : `latest observation ${s.last_obs_label} is ${s.age_days} days past its period end (limit ${s.limit_days})`}` })));
     bn.append(el("div", { class: "banner" + (issues.some(s => s.status === "unavailable") ? " bad" : ""), role: "status" }, el("strong", { text: `${issues.length} of ${Object.keys(S).length} series need attention` }), ul));
   }
 
-  // controls
-  let from = 2005;
-  const range = $("#range");
-  [2005, 2010, 2015, 2020].forEach(y => {
-    const b = el("button", { type: "button", "aria-pressed": String(y === from), text: y === 2005 ? "2005 (all)" : String(y) });
-    b.addEventListener("click", () => { from = y; range.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderAll(); });
-    range.append(b);
+  // chart groups: charts that belong together sit side by side
+  const r = root(); r.textContent = ""; hosts = []; tableBoxes = [];
+  GROUPS.forEach(g => {
+    const sec = el("section", { class: "chart", id: g.id });
+    sec.append(el("h2", { text: g.title }));
+    const row = el("div", { class: "row", style: `--cols:${g.charts.length}` });
+    g.charts.forEach(key => {
+      const def = CHARTS[key];
+      const host = el("div", { class: "host" }), leg = el("div", { class: "leg" });
+      const caps = el("div", { class: "cap" });
+      const seen = new Set();
+      def.panels.flatMap(p => p.series).forEach(s => { if (s.id !== "peg" && !seen.has(s.id)) { seen.add(s.id); caps.append(captionFor(S[s.id])); } });
+      (def.extraCaps || []).forEach(c => caps.append(captionExtra(c)));
+      const det = el("details", { class: "tbl" }, el("summary", { text: "Table view" }));
+      const box = el("div", {}); det.append(box);
+      det.addEventListener("toggle", () => { if (det.open) { box.textContent = ""; box.append(buildTable(def, doc, from)); } });
+      row.append(el("div", { class: "cell" },
+        el("div", { class: "head" }, el("h3", { text: def.title }), el("p", { class: "note", text: def.note })),
+        leg, host, el("div", { class: "below" }, caps, det)));
+      hosts.push({ def, host, leg }); tableBoxes.push({ def, det, box });
+    });
+    sec.append(row); r.append(sec);
   });
-  const themeBtn = $("#theme");
-  const modes = ["auto", "light", "dark"];
-  let mode = document.documentElement.dataset.theme || "auto";
-  const applyTheme = () => {
-    if (mode === "auto") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = mode;
-    themeBtn.textContent = `Theme: ${mode}`;
-    try { mode === "auto" ? localStorage.removeItem("theme") : localStorage.setItem("theme", mode); } catch (e) {}
-  };
-  themeBtn.addEventListener("click", () => { mode = modes[(modes.indexOf(mode) + 1) % 3]; applyTheme(); });
-  applyTheme();
-
-  // chart sections
-  const root = $("#charts"), hosts = [], tableBoxes = [];
-  CHARTS.forEach(def => {
-    const sec = el("section", { class: "chart", id: def.id });
-    sec.append(el("h2", { text: def.title }), el("p", { class: "read", text: def.read }));
-    const host = el("div", {}); sec.append(host);
-    const caps = el("div", { class: "cap" });
-    const seen = new Set();
-    def.panels.flatMap(p => p.series).forEach(s => { if (s.id !== "peg" && !seen.has(s.id)) { seen.add(s.id); caps.append(captionFor(S[s.id])); } });
-    (def.extraCaps || []).forEach(c => caps.append(captionExtra(c)));
-    sec.append(caps);
-    const det = el("details", { class: "tbl" }, el("summary", { text: "Table view" }));
-    const box = el("div", {}); det.append(box);
-    det.addEventListener("toggle", () => { if (det.open) { box.textContent = ""; box.append(buildTable(def, doc, from)); } });
-    sec.append(det);
-    root.append(sec);
-    hosts.push({ def, host }); tableBoxes.push({ def, det, box });
-  });
-  function renderAll() {
-    hosts.forEach(h => renderChart(h.def, doc, h.host, from));
-    tableBoxes.forEach(t => { if (t.det.open) { t.box.textContent = ""; t.box.append(buildTable(t.def, doc, from)); } });
-  }
   renderAll();
-  let lastW = root.clientWidth, timer;
-  new ResizeObserver(() => { clearTimeout(timer); timer = setTimeout(() => { if (root.clientWidth !== lastW) { lastW = root.clientWidth; renderAll(); } }, 120); }).observe(root);
 
   // gaps
-  const gl = $("#gap-list");
+  const gl = $("#gap-list"); gl.textContent = "";
   doc.unavailable.forEach(g => gl.append(el("div", { class: "gap" }, el("h3", { text: g.title }),
     el("p", { text: g.why }), el("p", {}, el("strong", { text: "Fallback: " }), g.fallback + " "), el("p", {}, el("a", { href: g.link, text: "Where to look" })))));
 
   // status table
-  const t = $("#status-table");
+  const t = $("#status-table"); t.textContent = "";
   t.append(el("thead", {}, el("tr", {}, ...["Series", "Status", "Last good fetch", "Latest observation", "Age / limit", "Data"].map(h => el("th", { text: h })))));
   const tb = el("tbody", {});
   Object.values(S).forEach(s => tb.append(el("tr", {},
@@ -443,5 +446,51 @@ async function main() {
     el("td", { text: s.age_days == null ? "" : `${s.age_days} / ${s.limit_days} days` }),
     el("td", {}, s.rows ? el("a", { href: `data/${s.id}.csv`, text: "CSV" }) : "none"))));
   t.append(tb);
+}
+
+async function main() {
+  try { doc = await loadDoc(false); }
+  catch (e) {
+    $("#st-ok").textContent = "Data file could not be loaded";
+    $("#banner").append(el("div", { class: "banner bad", role: "alert", text: `data.json failed to load (${e.message}). Reload the page; if it persists the last deploy is broken.` }));
+    return;
+  }
+
+  // controls
+  const range = $("#range");
+  [2005, 2010, 2015, 2020].forEach(y => {
+    const b = el("button", { type: "button", "aria-pressed": String(y === from), text: y === 2005 ? "2005 (all)" : String(y) });
+    b.addEventListener("click", () => { from = y; range.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderAll(); });
+    range.append(b);
+  });
+  const themeBtn = $("#theme"), modes = ["auto", "light", "dark"];
+  let mode = document.documentElement.dataset.theme || "auto";
+  const applyTheme = () => {
+    if (mode === "auto") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = mode;
+    themeBtn.textContent = `Theme: ${mode}`;
+    try { mode === "auto" ? localStorage.removeItem("theme") : localStorage.setItem("theme", mode); } catch (e) {}
+  };
+  themeBtn.addEventListener("click", () => { mode = modes[(modes.indexOf(mode) + 1) % 3]; applyTheme(); });
+  applyTheme();
+
+  // refresh: reload the latest PUBLISHED data. A static page cannot run the pipeline itself.
+  const rb = $("#refresh"), msg = $("#refresh-msg");
+  rb.addEventListener("click", async () => {
+    rb.disabled = true; msg.textContent = "Checking for newer data…";
+    try {
+      const next = await loadDoc(true);
+      const newer = next.meta.generated !== doc.meta.generated;
+      doc = next; build();
+      msg.textContent = newer ? `Loaded newer data, published ${fmtDanish(next.meta.generated)}.`
+                              : `Already showing the latest published data (${fmtDanish(next.meta.generated)}).`;
+    } catch (e) {
+      msg.textContent = `Could not reload (${e.message}). The data already on screen is unchanged.`;
+    }
+    rb.disabled = false;
+  });
+
+  build();
+  let lastW = root().clientWidth, timer;
+  new ResizeObserver(() => { clearTimeout(timer); timer = setTimeout(() => { if (root().clientWidth !== lastW) { lastW = root().clientWidth; renderAll(); } }, 120); }).observe(root());
 }
 main();
