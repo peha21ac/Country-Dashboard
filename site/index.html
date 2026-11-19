@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Côte d'Ivoire: keep the CFA peg or float?</title>
+<meta name="description" content="Auto-refreshing indicators on the CFA franc (XOF) peg to the euro for Côte d'Ivoire: exchange rates, real exchange rate, cocoa, trade, inflation, public finances and growth.">
+<link rel="stylesheet" href="style.css">
+<script>
+  try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <h1>Côte d'Ivoire: keep the CFA peg or float?</h1>
+    <p>Indicators for judging the peg of the CFA franc (XOF) to the euro, from public sources. The euro rate is fixed by law at 655.96 XOF; everything else on this page moves.</p>
+    <nav class="nav" aria-label="Pages">
+      <a href="methodology.html">Methodology and limitations</a>
+      <a href="#status">Data status</a>
+      <a href="#gaps">Data gaps</a>
+      <a href="https://github.com/peha21ac/Country-Dashboard">Code and data</a>
+    </nav>
+    <div class="stamps" id="stamps" aria-live="polite">
+      <div class="stamp"><h2>Last successful refresh</h2><div class="big" id="st-ok">Loading…</div><div class="sub" id="st-ok-sub"></div></div>
+      <div class="stamp"><h2>Latest observation</h2><div class="big">Shown per series</div><div class="sub">Each chart lists the date of its newest data point. It can be much older than the refresh, because sources publish with a lag.</div></div>
+    </div>
+    <div id="banner"></div>
+  </header>
+
+  <div class="controls" role="group" aria-label="Chart controls">
+    <div class="grp seg" id="range"><span class="lbl">Show from</span></div>
+    <div class="grp"><button class="btn" id="theme" type="button">Theme: auto</button></div>
+    <div class="key" aria-label="Shaded periods">
+      <span><i></i>2014–16 commodity slump</span><span><i></i>2020–21 COVID-19</span><span><i></i>2022 inflation surge</span>
+    </div>
+  </div>
+
+  <main id="charts"></main>
+
+  <section class="sec" id="reading">
+    <h2>How these indicators bear on the question</h2>
+    <p>This is standard reasoning about the channels, not a forecast. The dashboard supplies the inputs; it does not estimate what a devaluation or float would do.</p>
+    <ul>
+      <li><b>Debt.</b> A weaker XOF raises the XOF cost of debt owed in foreign currency. How much depends on the foreign-currency share of public debt, which is not available as a data series here (see data gaps). Debt issued in XOF on the regional market is not affected in nominal terms.</li>
+      <li><b>Trade.</b> Cocoa is sold in dollars while most costs are paid in XOF. A weaker XOF lifts the XOF value of each tonne, shown in the lower cocoa panel, and makes imports dearer. The real exchange rate chart shows whether the franc has drifted away from its 2010 level against the dollar.</li>
+      <li><b>Inflation.</b> Imported goods pass a weaker currency into consumer prices. The 2022 surge shows how exposed prices are to external shocks even under a peg.</li>
+      <li><b>Who decides.</b> The BCEAO sets monetary policy for all eight WAEMU members. The exchange-rate regime is a union decision, not one Côte d'Ivoire can change alone.</li>
+    </ul>
+  </section>
+
+  <section class="sec" id="gaps">
+    <h2>Data gaps</h2>
+    <p>These series from the brief could not be sourced reliably. They are left out, not estimated.</p>
+    <div id="gap-list"></div>
+  </section>
+
+  <section class="sec" id="status">
+    <h2>Data status</h2>
+    <p>A failed source keeps its last good data and shows as stale. The “last successful refresh” time above only moves when every series updates.</p>
+    <div class="scrollx"><table class="stat" id="status-table"></table></div>
+  </section>
+
+  <footer>
+    <div>Page data generated <span id="gen"></span>. <a href="methodology.html">Methodology and limitations</a></div>
+  </footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
