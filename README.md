@@ -14,7 +14,7 @@ An auto-refreshing dashboard of public indicators for judging the peg of the Wes
 | Cocoa | USD per tonne; XOF per tonne (derived) | FRED `PCOCOUSDM` | Monthly |
 | External balance | Goods and services, % of GDP | World Bank `NE.RSB.GNFS.ZS` | Annual |
 | Inflation | Headline CPI, % y/y | World Bank `FP.CPI.TOTL.ZG` | Annual |
-| BCEAO policy rates | Minimum bid rate, marginal lending rate (step lines) | BCEAO decisions entered by hand in `data/manual/bceao_policy_rate.csv`, each row with a source link | On decisions |
+| BCEAO policy rates | Minimum bid rate, marginal lending rate (step lines) | BCEAO decisions maintained in `data/manual/bceao_policy_rate.csv`, each row with a source link | On decisions |
 | Public finances | Net lending/borrowing, gross debt, % of GDP | IMF DataMapper `GGXCNL_NGDP`, `GGXWDG_NGDP` | Annual |
 | Real GDP growth | % y/y | IMF DataMapper `NGDP_RPCH` | Annual |
 

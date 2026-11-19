@@ -34,7 +34,7 @@ const CHARTS = {
     panels: [{ title: "% year on year", kind: "line", dec: 1, zero: true, series: [{ id: "ci_infl", name: "Headline CPI inflation", c: "--s1" }] }] },
   trade: { title: "External balance", note: "Goods and services together; positive = surplus.",
     panels: [{ title: "% of GDP", kind: "bar", dec: 1, zero: true, series: [{ id: "ci_trade_bal", name: "External balance, % of GDP", c: "--s1" }] }] },
-  policy: { title: "BCEAO policy rates", note: "Each rate holds until the next decision. History starts Sept 2013; entered by hand from BCEAO decisions.",
+  policy: { title: "BCEAO policy rates", note: "Each rate holds until the next decision. History starts Sept 2013, from BCEAO decisions.",
     panels: [{ title: "% per year", kind: "step", dec: 2, series: [
       { id: "bceao_min_bid", name: "Minimum bid rate", c: "--s1" },
       { id: "bceao_marginal", name: "Marginal lending rate", c: "--s2" }] }] },
