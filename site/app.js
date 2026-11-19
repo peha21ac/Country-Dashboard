@@ -49,7 +49,7 @@ const GROUPS = [
   { id: "macro", title: "Growth, prices and trade", charts: ["growth", "infl", "trade"] },
   { id: "policy", title: "Policy rates and public finances", charts: ["policy", "gov_bal", "debt"] },
 ];
-const FREQ_LABEL = { daily: "Daily", monthly: "Monthly", annual: "Annual", event: "Irregular: when the committee decides (entered by hand)" };
+const FREQ_LABEL = { daily: "Daily", monthly: "Monthly", annual: "Annual", event: "Irregular: when the committee decides" };
 
 // ---- helpers ---------------------------------------------------------------
 const $ = (s, r = document) => r.querySelector(s);
