@@ -66,17 +66,18 @@ function sv(tag, attrs = {}, text) {
   return e;
 }
 const fmtNum = (v, d) => Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
-function fmtUtc(iso) {
-  const d = new Date(iso);
-  return d.toISOString().slice(0, 16).replace("T", " ") + " UTC";
+// Display times: Danish (Europe/Copenhagen, CET/CEST) and Chicago (CST/CDT). Stored times stay UTC.
+function zoneFormatter(locale, tz) {
+  const f = new Intl.DateTimeFormat(locale, { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZoneName: "short" });
+  return iso => {
+    const p = Object.fromEntries(f.formatToParts(new Date(iso)).map(x => [x.type, x.value]));
+    return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute} ${p.timeZoneName}`;
+  };
 }
-const CHI = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit",
-  hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZoneName: "short" });
-function fmtChicago(iso) {
-  const p = Object.fromEntries(CHI.formatToParts(new Date(iso)).map(x => [x.type, x.value]));
-  return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute} ${p.timeZoneName}`;
-}
-const fmtBoth = iso => `${fmtUtc(iso)} (${fmtChicago(iso)}, Chicago)`;
+const fmtDanish = zoneFormatter("en-GB", "Europe/Copenhagen");   // en-GB prints CET/CEST
+const fmtChicago = zoneFormatter("en-CA", "America/Chicago");    // en-CA prints CST/CDT
+const fmtBoth = iso => `${fmtDanish(iso)} (${fmtChicago(iso)}, Chicago)`;
 function ago(iso) {
   const h = (Date.now() - new Date(iso).getTime()) / 36e5;
   if (h < 1) return "less than an hour ago";
@@ -363,7 +364,7 @@ async function main() {
 
   // two separate timestamps
   if (m.last_successful_refresh) {
-    $("#st-ok").textContent = fmtUtc(m.last_successful_refresh);
+    $("#st-ok").textContent = fmtDanish(m.last_successful_refresh);
     $("#st-ok-chi").textContent = `${fmtChicago(m.last_successful_refresh)} in Chicago`;
     $("#st-ok-sub").textContent = `${ago(m.last_successful_refresh)}. Last attempt: ${m.last_attempt ? fmtBoth(m.last_attempt) : "unknown"}.`;
   } else {
@@ -437,7 +438,7 @@ async function main() {
   const tb = el("tbody", {});
   Object.values(S).forEach(s => tb.append(el("tr", {},
     el("td", { text: s.title }), el("td", {}, statusBadge(s)),
-    el("td", { style: "white-space:nowrap" }, ...(s.last_fetch_ok ? [fmtUtc(s.last_fetch_ok), document.createElement("br"), fmtChicago(s.last_fetch_ok)] : ["never"])),
+    el("td", { style: "white-space:nowrap" }, ...(s.last_fetch_ok ? [fmtDanish(s.last_fetch_ok), document.createElement("br"), fmtChicago(s.last_fetch_ok)] : ["never"])),
     el("td", { text: s.last_obs_label || "none" }),
     el("td", { text: s.age_days == null ? "" : `${s.age_days} / ${s.limit_days} days` }),
     el("td", {}, s.rows ? el("a", { href: `data/${s.id}.csv`, text: "CSV" }) : "none"))));
