@@ -98,7 +98,7 @@ def _export(statuses, now, status_doc):
         df = read_series(sid)
         item = {k: spec[k] for k in ("id", "title", "freq", "unit", "source", "series_id", "url", "transform")}
         item.update(status=st["status"], error=st.get("error"), last_fetch_ok=st.get("last_fetch_ok"),
-                    derived="inputs" in spec, rows=0, last_obs=None, last_obs_label=None, age_days=None,
+                    derived="inputs" in spec, base_label=None, rows=0, last_obs=None, last_obs_label=None, age_days=None,
                     limit_days=None, warn=False, proj_from=None, dates=[], values=[], flags=[])
         if df is not None and len(df):
             last = _latest_actual(df)
@@ -109,6 +109,8 @@ def _export(statuses, now, status_doc):
                     s["limit_days"], s["warn"] = lag, s["age_days"] > lag
                 item.update(last_obs=last.strftime("%Y-%m-%d"), last_obs_label=fmt_obs(last, spec["freq"]),
                             age_days=s["age_days"], limit_days=s["limit_days"], warn=s["warn"])
+            if "describe" in spec:
+                item.update(spec["describe"](df))
             proj = df[df["flag"] == "proj"]
             if len(proj):
                 item["proj_from"] = fmt_obs(proj["date"].min(), spec["freq"])

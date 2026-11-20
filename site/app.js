@@ -21,8 +21,8 @@ const CHARTS = {
       transform: "None. Drawn as the constant 655.957 (shown as 655.96) across the same dates as EUR/USD." }] },
   eurusd: { title: "EUR/USD", note: "The dollar rate of the euro. It moves the blue line in the left chart.",
     panels: [{ title: "USD per 1 EUR (up = euro stronger)", kind: "line", dec: 3, series: [{ id: "eurusd", name: "EUR/USD", c: "--s3" }] }] },
-  rer: { title: "Real exchange rate vs USD", note: "Up = real depreciation; down = real appreciation, the usual sign of overvaluation. Change since 2010, not the right level.",
-    panels: [{ title: "Index, 2010 = 100", kind: "line", dec: 1, ref: { v: 100, label: "2010 = 100" }, series: [{ id: "rer", name: "Real exchange rate vs USD", c: "--s1" }] }],
+  rer: { title: "Real exchange rate vs USD", note: "Up = real depreciation; down = real appreciation.",
+    panels: [{ title: "Index", kind: "line", dec: 1, ref: { v: 100, label: "average = 100" }, series: [{ id: "rer", name: "Real exchange rate vs USD", c: "--s1" }] }],
     ends: ["Real appreciation", "Real depreciation"] },
   cocoa_usd: { title: "Cocoa in dollars", note: "World price, the currency cocoa is sold in.",
     panels: [{ title: "USD per metric tonne", kind: "line", dec: 0, series: [{ id: "cocoa_usd", name: "Cocoa, USD per tonne", c: "--s1" }] }] },
@@ -383,6 +383,12 @@ function renderAll() {
 
 function build() {
   const m = doc.meta, S = doc.series;
+
+  // the real exchange rate's base period comes from the data, not from this file
+  const bl = S.rer.base_label || "sample";
+  CHARTS.rer.note = `Up = real depreciation; down = real appreciation. 100 is the ${bl} average, taken as the neutral level: below it the franc looks overvalued, above it undervalued.`;
+  CHARTS.rer.panels[0].title = `Index, ${bl} average = 100`;
+  CHARTS.rer.panels[0].ref.label = `${bl} average = 100`;
 
   // two separate timestamps
   if (m.last_successful_refresh) {

@@ -5,7 +5,9 @@ import pandas as pd
 
 from .common import PEG, ValidationError, make_df
 
-BASE_YEAR = 2010
+BASE_START = 2005     # first year of the base window
+BASE_END = None       # None = latest year available, so the window is the whole sample
+MIN_BASE_YEARS = 5
 
 
 def xof_per_usd(eurusd: pd.DataFrame) -> pd.DataFrame:
@@ -26,11 +28,14 @@ def monthly_mean(daily: pd.DataFrame, min_obs: int = 15) -> pd.DataFrame:
     return make_df([p.start_time for p in g.index], g["mean"])
 
 
-def real_exchange_rate(xof_usd_daily, ci_cpi, us_cpi, base_year: int = BASE_YEAR) -> pd.DataFrame:
-    """RER_t = (S_t * P*_t / P_t) / (S_b * P*_b / P_b) * 100, annual, base year b.
+def real_exchange_rate(xof_usd_daily, ci_cpi, us_cpi, base_start: int = BASE_START, base_end: int | None = BASE_END,
+                        min_years: int = MIN_BASE_YEARS) -> pd.DataFrame:
+    """RER_t = (S_t * P*_t / P_t) / mean_b(S_b * P*_b / P_b) * 100, annual.
 
     S = annual mean XOF per USD, P* = US CPI index, P = Ivorian CPI index.
-    Only years present in all three inputs are produced (no filling).
+    The base is the AVERAGE of S x P*/P over the years base_start..base_end
+    (base_end None = latest year), so 100 means "equal to its historic average",
+    taken as the neutral level. Only years present in all inputs are produced.
     """
     s = annual_mean(xof_usd_daily)
     frames = {
@@ -39,10 +44,12 @@ def real_exchange_rate(xof_usd_daily, ci_cpi, us_cpi, base_year: int = BASE_YEAR
         "ps": us_cpi.assign(y=us_cpi["date"].dt.year).set_index("y")["value"],
     }
     j = pd.concat(frames, axis=1, join="inner").sort_index()
-    if base_year not in j.index:
-        raise ValidationError(f"base year {base_year} missing from RER inputs")
     raw = j["s"] * j["ps"] / j["p"]
-    rer = raw / raw.loc[base_year] * 100.0
+    end = base_end if base_end is not None else int(raw.index.max()) if len(raw) else base_start
+    window = raw[(raw.index >= base_start) & (raw.index <= end)]
+    if len(window) < min_years:
+        raise ValidationError(f"only {len(window)} year(s) in base window {base_start}-{end}, need {min_years}")
+    rer = raw / window.mean() * 100.0
     return make_df([f"{y}-12-31" for y in rer.index], rer.values)
 
 

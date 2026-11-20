@@ -124,24 +124,33 @@ def test_xof_per_usd_hand_calc():
     assert out["value"].iloc[0] * 1.25 == pytest.approx(PEG)
 
 
-def test_rer_hand_calc_and_base():
-    # S constant 500; US CPI doubles 2010->2020, CIV CPI rises 50%:
-    # RER_2020 = (500*200/150) / (500*100/100) * 100 = 133.33
+def rer_inputs():
+    # S constant 500; US CPI doubles 2010->2020, CIV CPI rises 50%
     days = pd.bdate_range("2009-01-01", "2021-01-01")
     xof = make_df(days, np.full(len(days), 500.0))
     ci = make_df(["2010-12-31", "2020-12-31"], [100.0, 150.0])
     us = make_df(["2010-12-31", "2020-12-31"], [100.0, 200.0])
-    rer = transforms.real_exchange_rate(xof, ci, us, base_year=2010).set_index("date")["value"]
-    assert rer[pd.Timestamp("2010-12-31")] == pytest.approx(100.0)
-    assert rer[pd.Timestamp("2020-12-31")] == pytest.approx(133.3333, rel=1e-4)
+    return xof, ci, us
 
 
-def test_rer_missing_base_year():
-    days = pd.bdate_range("2015-01-01", "2021-01-01")
-    xof = make_df(days, np.full(len(days), 500.0))
-    cpi = make_df(["2016-12-31", "2017-12-31"], [100.0, 101.0])
-    with pytest.raises(ValidationError, match="base year"):
-        transforms.real_exchange_rate(xof, cpi, cpi, base_year=2010)
+def test_rer_average_base_hand_calc():
+    # raw = S*P*/P: 2010 -> 500, 2020 -> 500*200/150 = 666.667; average = 583.333
+    # RER_2010 = 500/583.333*100 = 85.714 ; RER_2020 = 666.667/583.333*100 = 114.286
+    rer = transforms.real_exchange_rate(*rer_inputs(), base_start=2010, min_years=2).set_index("date")["value"]
+    assert rer[pd.Timestamp("2010-12-31")] == pytest.approx(85.7143, rel=1e-4)
+    assert rer[pd.Timestamp("2020-12-31")] == pytest.approx(114.2857, rel=1e-4)
+    assert rer.mean() == pytest.approx(100.0)            # the base window averages exactly 100
+
+
+def test_rer_base_window_can_be_narrowed():
+    rer = transforms.real_exchange_rate(*rer_inputs(), base_start=2020, base_end=2020, min_years=1).set_index("date")["value"]
+    assert rer[pd.Timestamp("2020-12-31")] == pytest.approx(100.0)
+    assert rer[pd.Timestamp("2010-12-31")] == pytest.approx(75.0)   # 500/666.667
+
+
+def test_rer_too_few_base_years_rejected():
+    with pytest.raises(ValidationError, match="base window"):
+        transforms.real_exchange_rate(*rer_inputs())          # default needs 5 years, only 2 exist
 
 
 def test_annual_mean_skips_incomplete_year():
@@ -221,7 +230,8 @@ def test_full_refresh_ok(sandbox):
     s = site["series"]
     assert s["ci_gdp_growth"]["proj_from"] == "2026"
     assert s["ci_gdp_growth"]["last_obs_label"] == "2025"     # latest ACTUAL, not projection
-    assert s["rer"]["values"][s["rer"]["dates"].index("2010-12-31")] == pytest.approx(100.0)
+    assert np.mean(s["rer"]["values"]) == pytest.approx(100.0)        # whole-sample average is the base
+    assert s["rer"]["base_label"] == "2005–2025" or s["rer"]["base_label"].startswith("2005–")
     assert s["eurusd"]["last_obs"] == "2026-11-13"            # from data, not from the clock
 
 
