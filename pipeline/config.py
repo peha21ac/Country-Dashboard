@@ -94,14 +94,11 @@ BY_ID = {s["id"]: s for s in ALL}
 
 # Series we cannot provide. Shown on the dashboard as explicit gaps.
 UNAVAILABLE = [
-    dict(id="civ_10y", title="Côte d'Ivoire 10-year yield and spread over the Bund",
-         why="No free, licence-clean daily 10-year series. Auction yields on UMOA-Titres are the nearest primary data but have no stable API.",
-         fallback="Export UMOA-Titres auction results manually, or license a data feed; the Bund leg is available from FRED (IRLTLT01DEM156N).",
-         link="https://www.umoatitres.org"),
+    dict(id="civ_10y", title="Côte d'Ivoire 10-year yield",
+         why="No free, licence-clean daily 10-year series."),
     dict(id="core_cpi", title="Core CPI inflation",
          why="No core CPI series for Côte d'Ivoire was found in the primary sources used here.",
-         fallback="None used. No proxy is shown, because a mislabelled proxy would mislead.",
-         link="https://www.ins.ci"),
+         fallback="None used. No proxy is shown, because a mislabelled proxy would mislead."),
     dict(id="fx_debt_share", title="Share of public debt in foreign currency",
          why="Published only in IMF/World Bank debt sustainability reports and the national debt office bulletins, not as an API series.",
          fallback="Read from the latest IMF Article IV / DSA manually.",

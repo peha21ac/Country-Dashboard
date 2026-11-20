@@ -36,7 +36,7 @@ Not available (shown on the dashboard as gaps, never estimated): Côte d'Ivoire 
 
 ## Refresh button
 
-A static page cannot run the pipeline, so the **Refresh data** button reloads the latest *published* data. The **Fetch new data from the sources** link opens the GitHub workflow page, where **Run workflow** starts a real fetch (needs write access to the repository).
+A static page cannot run the pipeline, so the **Refresh data** button reloads the latest *published* data. To fetch from the sources immediately, use **Actions → Refresh data and deploy → Run workflow** in the repository (needs write access).
 
 ## Updating the policy rates
 

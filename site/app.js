@@ -433,7 +433,9 @@ function build() {
   // gaps
   const gl = $("#gap-list"); gl.textContent = "";
   doc.unavailable.forEach(g => gl.append(el("div", { class: "gap" }, el("h3", { text: g.title }),
-    el("p", { text: g.why }), el("p", {}, el("strong", { text: "Fallback: " }), g.fallback + " "), el("p", {}, el("a", { href: g.link, text: "Where to look" })))));
+    el("p", { text: g.why }),
+    g.fallback ? el("p", {}, el("strong", { text: "Fallback: " }), g.fallback) : null,
+    g.link ? el("p", {}, el("a", { href: g.link, text: "Where to look" })) : null)));
 
   // status table
   const t = $("#status-table"); t.textContent = "";
