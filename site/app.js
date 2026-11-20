@@ -21,24 +21,30 @@ const CHARTS = {
       transform: "None. Drawn as the constant 655.957 (shown as 655.96) across the same dates as EUR/USD." }] },
   eurusd: { title: "EUR/USD", note: "The dollar rate of the euro. It moves the blue line in the left chart.",
     panels: [{ title: "USD per 1 EUR (up = euro stronger)", kind: "line", dec: 3, series: [{ id: "eurusd", name: "EUR/USD", c: "--s3" }] }] },
-  rer: { title: "Real exchange rate vs USD", note: "Ivorian CPI over US CPI times XOF per USD.",
-    panels: [{ title: "Index", kind: "line", dec: 1, ref: { v: 100, label: "average = 100" }, series: [{ id: "rer", name: "Real exchange rate vs USD", c: "--s1" }] }] },
+  rer: { title: "Real exchange rate vs USD", note: "Up = real appreciation; down = real depreciation.",
+    panels: [{ title: "Index", kind: "line", dec: 1, ref: { v: 100, label: "average = 100" }, series: [{ id: "rer", name: "Real exchange rate vs USD", c: "--s1" }] }],
+    ends: ["Real depreciation", "Real appreciation"] },
   cocoa_usd: { title: "Cocoa in dollars", note: "World price, the currency cocoa is sold in.",
-    panels: [{ title: "USD per metric tonne", kind: "line", dec: 0, series: [{ id: "cocoa_usd", name: "Cocoa, USD per tonne", c: "--s1" }] }] },
+    panels: [{ title: "USD per metric tonne", kind: "line", dec: 0, series: [{ id: "cocoa_usd", name: "Cocoa, USD per tonne", c: "--s1" }] }],
+    ends: ["Real depreciation", "Real appreciation"] },
   cocoa_xof: { title: "Cocoa in CFA francs", note: "Same price at the month's average XOF/USD rate: what is received in local currency.",
     panels: [{ title: "XOF million per metric tonne", kind: "line", dec: 2, series: [{ id: "cocoa_xof", name: "Cocoa, XOF million per tonne", c: "--s2" }] }] },
   growth: { title: "Real GDP growth", note: "Pale bars are IMF projections.",
-    panels: [{ title: "% year on year", kind: "bar", dec: 1, zero: true, series: [{ id: "ci_gdp_growth", name: "Real GDP growth", c: "--s1" }] }] },
+    panels: [{ title: "% year on year", kind: "bar", dec: 1, zero: true, series: [{ id: "ci_gdp_growth", name: "Real GDP growth", c: "--s1" }] }],
+    ends: ["Real depreciation", "Real appreciation"] },
   infl: { title: "Consumer price inflation", note: "Annual average, headline. Core inflation is not published here; no proxy is shown.",
-    panels: [{ title: "% year on year", kind: "line", dec: 1, zero: true, series: [{ id: "ci_infl", name: "Headline CPI inflation", c: "--s1" }] }] },
+    panels: [{ title: "% year on year", kind: "line", dec: 1, zero: true, series: [{ id: "ci_infl", name: "Headline CPI inflation", c: "--s1" }] }],
+    ends: ["Real depreciation", "Real appreciation"] },
   trade: { title: "External balance", note: "Goods and services together; positive = surplus.",
-    panels: [{ title: "% of GDP", kind: "bar", dec: 1, zero: true, series: [{ id: "ci_trade_bal", name: "External balance, % of GDP", c: "--s1" }] }] },
+    panels: [{ title: "% of GDP", kind: "bar", dec: 1, zero: true, series: [{ id: "ci_trade_bal", name: "External balance, % of GDP", c: "--s1" }] }],
+    ends: ["Real depreciation", "Real appreciation"] },
   policy: { title: "BCEAO policy rates", note: "Each rate holds until the next decision. History starts Sept 2013, from BCEAO decisions.",
     panels: [{ title: "% per year", kind: "step", dec: 2, series: [
       { id: "bceao_min_bid", name: "Minimum bid rate", c: "--s1" },
       { id: "bceao_marginal", name: "Marginal lending rate", c: "--s2" }] }] },
   gov_bal: { title: "Government balance", note: "Deficits are negative. Pale bars are IMF projections.",
-    panels: [{ title: "Net lending/borrowing, % of GDP", kind: "bar", dec: 1, zero: true, series: [{ id: "ci_gov_bal", name: "Net lending/borrowing", c: "--s1" }] }] },
+    panels: [{ title: "Net lending/borrowing, % of GDP", kind: "bar", dec: 1, zero: true, series: [{ id: "ci_gov_bal", name: "Net lending/borrowing", c: "--s1" }] }],
+    ends: ["Real depreciation", "Real appreciation"] },
   debt: { title: "Public debt", note: "Gross debt of general government. Dashed = IMF projections.",
     panels: [{ title: "% of GDP", kind: "line", dec: 1, series: [{ id: "ci_debt", name: "Gross debt", c: "--s2" }] }] },
 };
@@ -385,7 +391,7 @@ function build() {
 
   // the real exchange rate's base period comes from the data, not from this file
   const bl = S.rer.base_label || "sample";
-  CHARTS.rer.note = `XOF per USD times Ivorian CPI over US CPI. 100 is the ${bl} average. Up means a weaker franc against the dollar or faster Ivorian price growth than US price growth, so it has no single over- or undervaluation reading.`;
+  CHARTS.rer.note = `Up = real appreciation; down = real depreciation. 100 is the ${bl} average, taken as the neutral level: below it the franc looks undervalued, above it overvalued.`;
   CHARTS.rer.panels[0].title = `Index, ${bl} average = 100`;
   CHARTS.rer.panels[0].ref.label = `${bl} average = 100`;
 
