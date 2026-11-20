@@ -16,8 +16,7 @@ START_YEAR = int(START[:4])
 ECB_URL = "https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A"
 FRED_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv"
 WB_URL = "https://api.worldbank.org/v2/country/{country}/indicator/{indicator}"
-IMF_URL = "https://www.imf.org/external/datamapper/api/{ver}/{indicator}/{country}"
-IMF_VERSIONS = ("v2", "v1")   # the IMF now documents v2 as current; v1 series URLs began returning 404
+IMF_URL = "https://www.imf.org/external/datamapper/api/v1/{indicator}/{country}"
 
 
 # ----------------------------------------------------------------------- ECB
@@ -109,14 +108,8 @@ def parse_imf_datamapper(payload, indicator: str, country: str, current_year: in
 def fetch_imf(indicator: str, country: str = "CIV"):
     def _fetch(now=None) -> pd.DataFrame:
         now = now or utcnow()
-        errors = []
-        for ver in IMF_VERSIONS:
-            try:
-                r = http_get(IMF_URL.format(ver=ver, indicator=indicator, country=country))
-                return parse_imf_datamapper(r.json(), indicator, country, now.year)
-            except (FetchError, ValidationError, ValueError) as e:
-                errors.append(f"{ver}: {e}")
-        raise FetchError("; ".join(errors))
+        r = http_get(IMF_URL.format(indicator=indicator, country=country))
+        return parse_imf_datamapper(r.json(), indicator, country, now.year)
 
     return _fetch
 

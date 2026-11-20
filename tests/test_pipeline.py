@@ -317,39 +317,24 @@ def test_real_policy_file_is_consistent():
                df.loc[i - 1, ["min_bid_rate_pct", "marginal_rate_pct"]].tolist()
 
 
-# ------------------------------------------------------------ IMF v2/v1 fallback
-IMF_OK = {"values": {"NGDP_RPCH": {"CIV": {"2024": 6.0, "2025": 6.2}}}}
+# --------------------------------------------------------------- fetch throttle
+def test_annual_series_not_refetched_daily_but_failures_retry(sandbox, monkeypatch):
+    tmp, fetchers = sandbox
+    calls = {"n": 0, "fail": False}
+    inner = fetchers["ci_debt"]
 
+    def counted(now=None):
+        calls["n"] += 1
+        if calls["fail"]:
+            raise common.FetchError("HTTP 403")
+        return inner(now)
 
-class FakeResp:
-    def __init__(self, payload): self._p = payload
-    def json(self): return self._p
-
-
-def test_imf_uses_v2_first(monkeypatch):
-    seen = []
-    def fake(url, **kw): seen.append(url); return FakeResp(IMF_OK)
-    monkeypatch.setattr(sources, "http_get", fake)
-    df = sources.fetch_imf("NGDP_RPCH")(NOW)
-    assert "/api/v2/" in seen[0] and len(seen) == 1 and len(df) == 2
-
-
-def test_imf_falls_back_to_v1(monkeypatch):
-    def fake(url, **kw):
-        if "/api/v2/" in url: raise common.FetchError("HTTP 404")
-        return FakeResp(IMF_OK)
-    monkeypatch.setattr(sources, "http_get", fake)
-    assert len(sources.fetch_imf("NGDP_RPCH")(NOW)) == 2
-
-
-def test_imf_both_fail_reports_both(monkeypatch):
-    def fake(url, **kw): raise common.FetchError("HTTP 404")
-    monkeypatch.setattr(sources, "http_get", fake)
-    with pytest.raises(common.FetchError, match="v2.*v1"):
-        sources.fetch_imf("NGDP_RPCH")(NOW)
-
-
-def test_imf_unexpected_v2_shape_falls_back(monkeypatch):
-    def fake(url, **kw): return FakeResp({"oops": 1}) if "/api/v2/" in url else FakeResp(IMF_OK)
-    monkeypatch.setattr(sources, "http_get", fake)
-    assert len(sources.fetch_imf("NGDP_RPCH")(NOW)) == 2
+    monkeypatch.setitem(config.BY_ID["ci_debt"], "fetch", counted)
+    build.run(NOW);                              assert calls["n"] == 1
+    build.run(NOW + dt.timedelta(days=1));       assert calls["n"] == 1      # skipped, still ok
+    status, _ = load(tmp); assert status["series"]["ci_debt"]["status"] == "ok"
+    assert status["last_successful_refresh"] == "2026-11-19T12:00:00Z"       # skipped series do not block it
+    calls["fail"] = True
+    build.run(NOW + dt.timedelta(days=8));       assert calls["n"] == 2      # due again, fails
+    status, _ = load(tmp); assert status["series"]["ci_debt"]["status"] == "stale"
+    build.run(NOW + dt.timedelta(days=9));       assert calls["n"] == 3      # failing series retried every run

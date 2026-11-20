@@ -9,6 +9,7 @@ Failure policy
 """
 from __future__ import annotations
 
+import datetime as dt
 import json
 import os
 import shutil
@@ -23,6 +24,18 @@ from .common import (DATA, PEG, ROOT, SITE, fmt_obs, iso, load_json, log,
 
 STATUS_PATH = DATA / "status.json"
 
+# Annual series change about once or twice a year, so do not hit the source every day
+# (the IMF's firewall began refusing the build servers after repeated daily requests).
+REFETCH_DAYS = {"annual": 7}
+
+
+def _due(spec, entry, now) -> bool:
+    days = REFETCH_DAYS.get(spec["freq"])
+    if not days or entry.get("status") != "ok" or read_series(spec["id"]) is None or not entry.get("last_fetch_ok"):
+        return True      # failing, missing or never fetched: always retry
+    last = dt.datetime.strptime(entry["last_fetch_ok"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)
+    return now - last >= dt.timedelta(days=days)
+
 
 def _latest_actual(df: pd.DataFrame):
     actual = df[df["flag"] == ""]
@@ -32,6 +45,9 @@ def _latest_actual(df: pd.DataFrame):
 def _refresh_raw(spec, now, prev):
     sid = spec["id"]
     entry = dict(prev.get(sid, {}))
+    if not _due(spec, entry, now):
+        log(f"[skip]  {sid}: fetched OK {entry['last_fetch_ok']}, next fetch due in under {REFETCH_DAYS[spec['freq']]} days")
+        return entry
     try:
         df = spec["fetch"](now)
         validate(df, spec, now)
