@@ -125,7 +125,7 @@ def test_xof_per_usd_hand_calc():
 
 
 def rer_inputs():
-    # S constant 500; US CPI doubles 2010->2020, CIV CPI rises 50%
+    # S constant 500; US CPI doubles 2010->2020, CIV CPI rises 50%; RER = S x CI/US
     days = pd.bdate_range("2009-01-01", "2021-01-01")
     xof = make_df(days, np.full(len(days), 500.0))
     ci = make_df(["2010-12-31", "2020-12-31"], [100.0, 150.0])
@@ -137,15 +137,15 @@ def test_rer_average_base_hand_calc():
     # raw = S*P*/P: 2010 -> 500, 2020 -> 500*200/150 = 666.667; average = 583.333
     # RER_2010 = 500/583.333*100 = 85.714 ; RER_2020 = 666.667/583.333*100 = 114.286
     rer = transforms.real_exchange_rate(*rer_inputs(), base_start=2010, min_years=2).set_index("date")["value"]
-    assert rer[pd.Timestamp("2010-12-31")] == pytest.approx(85.7143, rel=1e-4)
-    assert rer[pd.Timestamp("2020-12-31")] == pytest.approx(114.2857, rel=1e-4)
+    assert rer[pd.Timestamp("2010-12-31")] == pytest.approx(114.2857, rel=1e-4)
+    assert rer[pd.Timestamp("2020-12-31")] == pytest.approx(85.7143, rel=1e-4)
     assert rer.mean() == pytest.approx(100.0)            # the base window averages exactly 100
 
 
 def test_rer_base_window_can_be_narrowed():
     rer = transforms.real_exchange_rate(*rer_inputs(), base_start=2020, base_end=2020, min_years=1).set_index("date")["value"]
     assert rer[pd.Timestamp("2020-12-31")] == pytest.approx(100.0)
-    assert rer[pd.Timestamp("2010-12-31")] == pytest.approx(75.0)   # 500/666.667
+    assert rer[pd.Timestamp("2010-12-31")] == pytest.approx(133.3333, rel=1e-4)   # 500/375
 
 
 def test_rer_too_few_base_years_rejected():

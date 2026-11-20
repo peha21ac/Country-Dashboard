@@ -72,9 +72,9 @@ RAW = [
 def _describe_rer(df):
     y0, y1 = int(df["date"].dt.year.min()), int(df["date"].dt.year.max())
     label = f"{y0}–{y1}"
-    return dict(base_label=label, unit=f"Index, {label} average = 100 (up = XOF real depreciation)",
+    return dict(base_label=label, unit=f"Index, {label} average = 100 (formula as specified, see methodology)",
                 transform=f"RER = (S x P*/P) divided by its average over {label}, times 100. 100 is taken as the neutral level. "
-                          "S = annual mean XOF per USD (years with >= 200 daily obs), P* = US CPI, P = Ivorian CPI. "
+                          "S = annual mean XOF per USD (years with >= 200 daily obs), P* = Ivorian CPI, P = US CPI. "
                           "Only years present in all inputs. The base window grows when a new year of data arrives.")
 
 
@@ -84,14 +84,14 @@ DERIVED = [
          inputs=["eurusd"], compute=lambda d: T.xof_per_usd(d["eurusd"]), min_rows=4000, lo=300, hi=900,
          source="Derived from ECB EUR/USD and the legal parity of 655.957 XOF per EUR", series_id="derived", url="https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.USD.EUR.SP00.A",
          transform=f"XOF/USD = {PEG} / EURUSD. The XOF/EUR line is the fixed legal parity, not a market quote."),
-    dict(id="rer", title="Real exchange rate vs USD", freq="annual", unit="Index, sample average = 100 (up = XOF real depreciation)",
+    dict(id="rer", title="Real exchange rate vs USD", freq="annual", unit="Index, sample average = 100 (formula as specified, see methodology)",
          inputs=["xof_usd", "ci_cpi_idx", "us_cpi_idx"],
          compute=lambda d: T.real_exchange_rate(d["xof_usd"], d["ci_cpi_idx"], d["us_cpi_idx"]),
          min_rows=10, lo=40, hi=250, lag_limit_days=730,
          describe=lambda df: _describe_rer(df),
          source="Derived from ECB EUR/USD and World Bank CPI (CIV, USA)", series_id="derived", url=wb_link("FP.CPI.TOTL"),
          transform="RER = (S x P*/P) divided by its average over the whole sample, times 100. S = annual mean XOF per USD "
-                   "(years with >= 200 daily obs), P* = US CPI, P = Ivorian CPI. Only years present in all inputs."),
+                   "(years with >= 200 daily obs), P* = Ivorian CPI, P = US CPI. Only years present in all inputs."),
     dict(id="cocoa_xof", title="Cocoa price in XOF (derived)", freq="monthly", unit="XOF million per tonne",
          inputs=["cocoa_usd", "xof_usd"], compute=lambda d: T.cocoa_in_xof(d["cocoa_usd"], d["xof_usd"]),
          min_rows=200, lo=0.1, hi=60,

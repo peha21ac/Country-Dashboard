@@ -30,10 +30,11 @@ def monthly_mean(daily: pd.DataFrame, min_obs: int = 15) -> pd.DataFrame:
 
 def real_exchange_rate(xof_usd_daily, ci_cpi, us_cpi, base_start: int = BASE_START, base_end: int | None = BASE_END,
                         min_years: int = MIN_BASE_YEARS) -> pd.DataFrame:
-    """RER_t = (S_t * P*_t / P_t) / mean_b(S_b * P*_b / P_b) * 100, annual.
+    """RER_t = (S_t * P*_t / P_t) / mean_b(S_b * P*_b / P_b) * 100, annual,
+    with P* = Ivorian CPI and P = US CPI (the specification asked for; see the methodology page).
 
-    S = annual mean XOF per USD, P* = US CPI index, P = Ivorian CPI index.
-    The base is the AVERAGE of S x P*/P over the years base_start..base_end
+    S = annual mean XOF per USD, P* = Ivorian CPI index, P = US CPI index.
+    The base is the AVERAGE of S x P_CI/P_US over the years base_start..base_end
     (base_end None = latest year), so 100 means "equal to its historic average",
     taken as the neutral level. Only years present in all inputs are produced.
     """
@@ -44,7 +45,7 @@ def real_exchange_rate(xof_usd_daily, ci_cpi, us_cpi, base_start: int = BASE_STA
         "ps": us_cpi.assign(y=us_cpi["date"].dt.year).set_index("y")["value"],
     }
     j = pd.concat(frames, axis=1, join="inner").sort_index()
-    raw = j["s"] * j["ps"] / j["p"]
+    raw = j["s"] * j["p"] / j["ps"]
     end = base_end if base_end is not None else int(raw.index.max()) if len(raw) else base_start
     window = raw[(raw.index >= base_start) & (raw.index <= end)]
     if len(window) < min_years:
