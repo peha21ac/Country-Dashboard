@@ -1,15 +1,15 @@
 {
-  "last_attempt": "2026-11-25T17:22:29Z",
-  "last_successful_refresh": "2026-11-25T17:22:29Z",
+  "last_attempt": "2026-11-26T17:02:10Z",
+  "last_successful_refresh": "2026-11-26T17:02:10Z",
   "series": {
     "bceao_marginal": {
       "error": null,
-      "last_fetch_ok": "2026-11-25T17:22:29Z",
+      "last_fetch_ok": "2026-11-26T17:02:10Z",
       "status": "ok"
     },
     "bceao_min_bid": {
       "error": null,
-      "last_fetch_ok": "2026-11-25T17:22:29Z",
+      "last_fetch_ok": "2026-11-26T17:02:10Z",
       "status": "ok"
     },
     "ci_cpi_idx": {
@@ -44,22 +44,22 @@
     },
     "cocoa_usd": {
       "error": null,
-      "last_fetch_ok": "2026-11-25T17:22:29Z",
+      "last_fetch_ok": "2026-11-26T17:02:10Z",
       "status": "ok"
     },
     "cocoa_xof": {
       "error": null,
-      "last_fetch_ok": "2026-11-25T17:22:29Z",
+      "last_fetch_ok": "2026-11-26T17:02:10Z",
       "status": "ok"
     },
     "eurusd": {
       "error": null,
-      "last_fetch_ok": "2026-11-25T17:22:29Z",
+      "last_fetch_ok": "2026-11-26T17:02:10Z",
       "status": "ok"
     },
     "rer": {
       "error": null,
-      "last_fetch_ok": "2026-11-25T17:22:29Z",
+      "last_fetch_ok": "2026-11-26T17:02:10Z",
       "status": "ok"
     },
     "us_cpi_idx": {
@@ -69,7 +69,7 @@
     },
     "xof_usd": {
       "error": null,
-      "last_fetch_ok": "2026-11-25T17:22:29Z",
+      "last_fetch_ok": "2026-11-26T17:02:10Z",
       "status": "ok"
     }
   }
